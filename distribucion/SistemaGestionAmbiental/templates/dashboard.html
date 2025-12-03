@@ -1,0 +1,267 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Sistema de Gestión Ambiental{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-speedometer2"></i> Dashboard</h1>
+    <span class="text-muted" id="fecha-actual"></span>
+</div>
+
+<!-- Indicadores principales -->
+<div class="row mb-4">
+    {% for key, ind in indicadores.items() %}
+    <div class="col-md-3 mb-3">
+        <div class="card indicator-card">
+            <div class="card-body">
+                <h6 class="text-muted mb-2">{{ ind.descripcion }}</h6>
+                <div class="indicator-value">{{ "%.2f"|format(ind.valor) }} <small class="text-muted">{{ ind.unidad }}</small></div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Gráficos -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-bar-chart"></i> Producción Mensual
+            </div>
+            <div class="card-body">
+                <canvas id="produccionChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-graph-up-arrow"></i> Consumos Mensuales
+            </div>
+            <div class="card-body">
+                <canvas id="consumosChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Gráfico Producción vs Reciclaje -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-arrow-repeat"></i> Pilas Producidas vs Recicladas
+            </div>
+            <div class="card-body">
+                <canvas id="produccionReciclajeChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Registros recientes -->
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-box-seam"></i> Producción Reciente
+            </div>
+            <div class="card-body">
+                {% if produccion_reciente %}
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Producido</th>
+                                <th>Rechazado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for p in produccion_reciente %}
+                            <tr>
+                                <td>{{ p.fecha.strftime('%d/%m/%Y') }}</td>
+                                <td>{{ p.cantidad_producida }}</td>
+                                <td><span class="badge bg-danger">{{ p.cantidad_rechazada }}</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">No hay registros recientes</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-droplet"></i> Consumos Recientes
+            </div>
+            <div class="card-body">
+                {% if consumos_recientes %}
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Recurso</th>
+                                <th>Cantidad</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for c in consumos_recientes %}
+                            <tr>
+                                <td>{{ c.fecha.strftime('%d/%m/%Y') }}</td>
+                                <td>{{ c.tipo_recurso }}</td>
+                                <td>{{ "%.2f"|format(c.cantidad) }} {{ c.unidad }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">No hay registros recientes</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-trash"></i> Residuos Recientes
+            </div>
+            <div class="card-body">
+                {% if residuos_recientes %}
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Tipo</th>
+                                <th>Cantidad</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for r in residuos_recientes %}
+                            <tr>
+                                <td>{{ r.fecha.strftime('%d/%m/%Y') }}</td>
+                                <td>{{ r.tipo_residuo }}</td>
+                                <td>{{ "%.2f"|format(r.cantidad) }} {{ r.unidad }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">No hay registros recientes</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Mostrar fecha actual
+    document.getElementById('fecha-actual').textContent = new Date().toLocaleDateString('es-ES');
+    
+    // Gráfico de producción
+    fetch('/api/produccion_mensual')
+        .then(response => response.json())
+        .then(data => {
+            new Chart(document.getElementById('produccionChart'), {
+                type: 'line',
+                data: {
+                    labels: data.meses,
+                    datasets: [{
+                        label: 'Producción',
+                        data: data.produccion,
+                        borderColor: 'rgb(102, 126, 234)',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        tension: 0.4
+                    }, {
+                        label: 'Rechazos',
+                        data: data.rechazos,
+                        borderColor: 'rgb(220, 53, 69)',
+                        backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true
+                }
+            });
+        });
+
+    // Gráfico de consumos
+    fetch('/api/consumos_mensuales')
+        .then(response => response.json())
+        .then(data => {
+            new Chart(document.getElementById('consumosChart'), {
+                type: 'bar',
+                data: {
+                    labels: data.meses,
+                    datasets: [{
+                        label: 'Agua (L)',
+                        data: data.agua,
+                        backgroundColor: 'rgba(54, 162, 235, 0.6)'
+                    }, {
+                        label: 'Energía (kWh)',
+                        data: data.energia,
+                        backgroundColor: 'rgba(255, 206, 86, 0.6)'
+                    }, {
+                        label: 'Zinc (kg)',
+                        data: data.zinc,
+                        backgroundColor: 'rgba(75, 192, 192, 0.6)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        });
+
+    // Gráfico Producción vs Reciclaje
+    fetch('/api/produccion_vs_reciclaje')
+        .then(response => response.json())
+        .then(data => {
+            new Chart(document.getElementById('produccionReciclajeChart'), {
+                type: 'line',
+                data: {
+                    labels: data.meses,
+                    datasets: [{
+                        label: 'Pilas Producidas',
+                        data: data.produccion,
+                        borderColor: 'rgb(102, 126, 234)',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        tension: 0.4
+                    }, {
+                        label: 'Pilas Recicladas',
+                        data: data.reciclaje,
+                        borderColor: 'rgb(40, 167, 69)',
+                        backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true
+                }
+            });
+        });
+</script>
+{% endblock %}
+

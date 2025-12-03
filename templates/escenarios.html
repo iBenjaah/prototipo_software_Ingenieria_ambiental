@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+
+{% block title %}Escenarios de Mejora - Sistema de Gestión Ambiental{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-lightbulb"></i> Evaluación de Escenarios de Mejora</h1>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="bi bi-info-circle"></i> Estrategias de Economía Circular
+            </div>
+            <div class="card-body">
+                <p>Este módulo permite evaluar escenarios de mejora basados en estrategias de economía circular para optimizar el desempeño ambiental del proceso de producción de baterías zinc-aire.</p>
+                
+                <h5 class="mt-4">Estrategias Disponibles:</h5>
+                <div class="row mt-3">
+                    <div class="col-md-6 mb-3">
+                        <div class="card border-primary">
+                            <div class="card-body">
+                                <h6><i class="bi bi-arrow-down-circle text-primary"></i> Reducción de Consumos</h6>
+                                <ul class="small">
+                                    <li>Optimización del consumo de agua</li>
+                                    <li>Mejora de eficiencia energética</li>
+                                    <li>Reducción de consumo de materiales</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="card border-success">
+                            <div class="card-body">
+                                <h6><i class="bi bi-arrow-repeat text-success"></i> Reciclaje y Recuperación</h6>
+                                <ul class="small">
+                                    <li>Aumento de tasa de reciclaje</li>
+                                    <li>Recuperación de zinc y acero</li>
+                                    <li>Reutilización de KOH</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="card border-warning">
+                            <div class="card-body">
+                                <h6><i class="bi bi-trash text-warning"></i> Reducción de Residuos</h6>
+                                <ul class="small">
+                                    <li>Minimización de pilas rechazadas</li>
+                                    <li>Gestión adecuada de efluentes</li>
+                                    <li>Reproceso interno de materiales</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="card border-info">
+                            <div class="card-body">
+                                <h6><i class="bi bi-graph-up-arrow text-info"></i> Mejora de Indicadores</h6>
+                                <ul class="small">
+                                    <li>Reducción de tasa de rechazo</li>
+                                    <li>Mejora de eficiencia de materiales</li>
+                                    <li>Optimización de indicadores ODS</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Calculadora de escenarios -->
+<div class="card">
+    <div class="card-header">
+        <i class="bi bi-calculator"></i> Calculadora de Escenarios
+    </div>
+    <div class="card-body">
+        <form id="formEscenario">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="reduccion_agua" class="form-label">Reducción de Consumo de Agua (%)</label>
+                    <input type="number" class="form-control" id="reduccion_agua" min="0" max="100" value="0">
+                </div>
+                <div class="col-md-6">
+                    <label for="reduccion_energia" class="form-label">Reducción de Consumo de Energía (%)</label>
+                    <input type="number" class="form-control" id="reduccion_energia" min="0" max="100" value="0">
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="aumento_reciclaje" class="form-label">Aumento de Tasa de Reciclaje (%)</label>
+                    <input type="number" class="form-control" id="aumento_reciclaje" min="0" max="100" value="0">
+                </div>
+                <div class="col-md-6">
+                    <label for="reduccion_rechazo" class="form-label">Reducción de Tasa de Rechazo (%)</label>
+                    <input type="number" class="form-control" id="reduccion_rechazo" min="0" max="100" value="0">
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="produccion_mensual" class="form-label">Producción Mensual Estimada</label>
+                    <input type="number" class="form-control" id="produccion_mensual" min="0" value="10000">
+                </div>
+            </div>
+            <button type="button" class="btn btn-primary" onclick="calcularEscenario()">
+                <i class="bi bi-calculator"></i> Calcular Escenario
+            </button>
+        </form>
+        
+        <div id="resultadosEscenario" class="mt-4" style="display: none;">
+            <h5>Resultados del Escenario:</h5>
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <div class="card border-success">
+                        <div class="card-body">
+                            <h6>Ahorro de Agua</h6>
+                            <h4 id="ahorro_agua" class="text-success">-</h4>
+                            <small class="text-muted">Litros/mes</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card border-success">
+                        <div class="card-body">
+                            <h6>Ahorro de Energía</h6>
+                            <h4 id="ahorro_energia" class="text-success">-</h4>
+                            <small class="text-muted">kWh/mes</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mt-3">
+                    <div class="card border-info">
+                        <div class="card-body">
+                            <h6>Material Recuperado</h6>
+                            <h4 id="material_recuperado" class="text-info">-</h4>
+                            <small class="text-muted">kg/mes</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mt-3">
+                    <div class="card border-warning">
+                        <div class="card-body">
+                            <h6>Reducción de Residuos</h6>
+                            <h4 id="reduccion_residuos" class="text-warning">-</h4>
+                            <small class="text-muted">unidades/mes</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function calcularEscenario() {
+    // Obtener valores actuales (valores de ejemplo, en producción se obtendrían de la BD)
+    const consumo_agua_actual = 50000; // L/mes
+    const consumo_energia_actual = 10000; // kWh/mes
+    const tasa_reciclaje_actual = 30; // %
+    const tasa_rechazo_actual = 5; // %
+    const produccion_mensual = parseFloat(document.getElementById('produccion_mensual').value);
+    
+    // Obtener mejoras propuestas
+    const reduccion_agua = parseFloat(document.getElementById('reduccion_agua').value) / 100;
+    const reduccion_energia = parseFloat(document.getElementById('reduccion_energia').value) / 100;
+    const aumento_reciclaje = parseFloat(document.getElementById('aumento_reciclaje').value) / 100;
+    const reduccion_rechazo = parseFloat(document.getElementById('reduccion_rechazo').value) / 100;
+    
+    // Calcular ahorros
+    const ahorro_agua = consumo_agua_actual * reduccion_agua;
+    const ahorro_energia = consumo_energia_actual * reduccion_energia;
+    
+    // Calcular material recuperado (asumiendo 0.5 kg de zinc por pila)
+    const tasa_reciclaje_nueva = Math.min(100, tasa_reciclaje_actual + (aumento_reciclaje * 100));
+    const material_recuperado = (produccion_mensual * 0.5 * tasa_reciclaje_nueva) / 100;
+    
+    // Calcular reducción de residuos
+    const tasa_rechazo_nueva = Math.max(0, tasa_rechazo_actual - (reduccion_rechazo * 100));
+    const residuos_actuales = produccion_mensual * (tasa_rechazo_actual / 100);
+    const residuos_nuevos = produccion_mensual * (tasa_rechazo_nueva / 100);
+    const reduccion_residuos = residuos_actuales - residuos_nuevos;
+    
+    // Mostrar resultados
+    document.getElementById('ahorro_agua').textContent = ahorro_agua.toFixed(2);
+    document.getElementById('ahorro_energia').textContent = ahorro_energia.toFixed(2);
+    document.getElementById('material_recuperado').textContent = material_recuperado.toFixed(2);
+    document.getElementById('reduccion_residuos').textContent = reduccion_residuos.toFixed(0);
+    
+    document.getElementById('resultadosEscenario').style.display = 'block';
+}
+</script>
+{% endblock %}
+

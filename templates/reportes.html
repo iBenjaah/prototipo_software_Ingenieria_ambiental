@@ -1,0 +1,264 @@
+{% extends "base.html" %}
+
+{% block title %}Reportes - Sistema de Gestión Ambiental{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-file-earmark-text"></i> Reportes</h1>
+</div>
+
+<!-- Filtros -->
+<div class="card mb-4">
+    <div class="card-header">
+        <i class="bi bi-funnel"></i> Filtros de Período
+    </div>
+    <div class="card-body">
+        <form method="GET" action="{{ url_for('reportes') }}" class="row g-3">
+            <div class="col-md-4">
+                <label for="fecha_inicio" class="form-label">Fecha Inicio</label>
+                <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" value="{{ fecha_inicio }}">
+            </div>
+            <div class="col-md-4">
+                <label for="fecha_fin" class="form-label">Fecha Fin</label>
+                <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" value="{{ fecha_fin }}">
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-search"></i> Generar Reporte
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Resumen ejecutivo -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="text-muted">Total Producido</h5>
+                <h2 class="text-primary">{{ total_producido }}</h2>
+                <small class="text-muted">unidades</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="text-muted">Total Rechazado</h5>
+                <h2 class="text-danger">{{ total_rechazado }}</h2>
+                <small class="text-muted">unidades</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="text-muted">Tasa de Rechazo</h5>
+                <h2 class="text-warning">
+                    {% if total_producido > 0 %}
+                    {{ "%.2f"|format((total_rechazado / total_producido) * 100) }}%
+                    {% else %}
+                    0%
+                    {% endif %}
+                </h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="text-muted">Período</h5>
+                <h6>{{ fecha_inicio }} a {{ fecha_fin }}</h6>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Producción -->
+<div class="card mb-4">
+    <div class="card-header">
+        <i class="bi bi-box-seam"></i> Producción del Período
+    </div>
+    <div class="card-body">
+        {% if produccion_periodo %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Lote</th>
+                        <th>Producido</th>
+                        <th>Rechazado</th>
+                        <th>Tasa Rechazo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in produccion_periodo %}
+                    <tr>
+                        <td>{{ p.fecha.strftime('%d/%m/%Y') }}</td>
+                        <td>{{ p.lote or '-' }}</td>
+                        <td>{{ p.cantidad_producida }}</td>
+                        <td>{{ p.cantidad_rechazada }}</td>
+                        <td>
+                            {% if p.cantidad_producida > 0 %}
+                            {{ "%.2f"|format((p.cantidad_rechazada / p.cantidad_producida) * 100) }}%
+                            {% else %}
+                            0%
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted text-center py-4">No hay registros de producción en este período.</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Consumos -->
+<div class="card mb-4">
+    <div class="card-header">
+        <i class="bi bi-droplet"></i> Consumos del Período
+    </div>
+    <div class="card-body">
+        {% if consumos_periodo %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Recurso</th>
+                        <th>Cantidad</th>
+                        <th>Unidad</th>
+                        <th>Costo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in consumos_periodo %}
+                    <tr>
+                        <td>{{ c.fecha.strftime('%d/%m/%Y') }}</td>
+                        <td>{{ c.tipo_recurso }}</td>
+                        <td>{{ "%.2f"|format(c.cantidad) }}</td>
+                        <td>{{ c.unidad }}</td>
+                        <td>
+                            {% if c.costo %}
+                            ${{ "%.2f"|format(c.costo) }}
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted text-center py-4">No hay registros de consumos en este período.</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Residuos -->
+<div class="card mb-4">
+    <div class="card-header">
+        <i class="bi bi-trash"></i> Residuos del Período
+    </div>
+    <div class="card-body">
+        {% if residuos_periodo %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Tipo</th>
+                        <th>Cantidad</th>
+                        <th>Unidad</th>
+                        <th>Destino</th>
+                        <th>Gestor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in residuos_periodo %}
+                    <tr>
+                        <td>{{ r.fecha.strftime('%d/%m/%Y') }}</td>
+                        <td>{{ r.tipo_residuo }}</td>
+                        <td>{{ "%.2f"|format(r.cantidad) }}</td>
+                        <td>{{ r.unidad }}</td>
+                        <td>{{ r.destino or '-' }}</td>
+                        <td>{{ r.gestor or '-' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted text-center py-4">No hay registros de residuos en este período.</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Reciclaje -->
+<div class="card mb-4">
+    <div class="card-header">
+        <i class="bi bi-arrow-repeat"></i> Reciclaje del Período
+    </div>
+    <div class="card-body">
+        {% if reciclaje_periodo %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Material</th>
+                        <th>Cantidad</th>
+                        <th>Unidad</th>
+                        <th>Origen</th>
+                        <th>Valor Estimado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for rec in reciclaje_periodo %}
+                    <tr>
+                        <td>{{ rec.fecha.strftime('%d/%m/%Y') }}</td>
+                        <td>{{ rec.material_recuperado }}</td>
+                        <td>{{ "%.2f"|format(rec.cantidad) }}</td>
+                        <td>{{ rec.unidad }}</td>
+                        <td>{{ rec.origen or '-' }}</td>
+                        <td>
+                            {% if rec.valor_estimado %}
+                            ${{ "%.2f"|format(rec.valor_estimado) }}
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted text-center py-4">No hay registros de reciclaje en este período.</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Botón para imprimir -->
+<div class="text-center mb-4">
+    <button class="btn btn-primary" onclick="window.print()">
+        <i class="bi bi-printer"></i> Imprimir Reporte
+    </button>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    @media print {
+        .sidebar, .btn, nav { display: none !important; }
+        .main-content { margin: 0 !important; }
+    }
+</style>
+{% endblock %}
+

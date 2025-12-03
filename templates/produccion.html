@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}Producción - Sistema de Gestión Ambiental{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-box-seam"></i> Gestión de Producción</h1>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalProduccion">
+        <i class="bi bi-plus-circle"></i> Nuevo Registro
+    </button>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <i class="bi bi-list-ul"></i> Registros de Producción
+    </div>
+    <div class="card-body">
+        {% if registros %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Lote</th>
+                        <th>Cantidad Producida</th>
+                        <th>Cantidad Rechazada</th>
+                        <th>Tasa Rechazo</th>
+                        <th>Observaciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reg in registros %}
+                    <tr>
+                        <td>{{ reg.fecha.strftime('%d/%m/%Y') }}</td>
+                        <td>{{ reg.lote or '-' }}</td>
+                        <td><strong>{{ reg.cantidad_producida }}</strong></td>
+                        <td>
+                            {% if reg.cantidad_rechazada > 0 %}
+                            <span class="badge bg-danger">{{ reg.cantidad_rechazada }}</span>
+                            {% else %}
+                            <span class="badge bg-success">0</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if reg.cantidad_producida > 0 %}
+                            {{ "%.2f"|format((reg.cantidad_rechazada / reg.cantidad_producida) * 100) }}%
+                            {% else %}
+                            0%
+                            {% endif %}
+                        </td>
+                        <td>{{ reg.observaciones or '-' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted text-center py-4">No hay registros de producción. Agregue el primer registro.</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal para nuevo registro -->
+<div class="modal fade" id="modalProduccion" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Nuevo Registro de Producción</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('produccion') }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="fecha" class="form-label">Fecha *</label>
+                        <input type="date" class="form-control" id="fecha" name="fecha" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="cantidad_producida" class="form-label">Cantidad Producida *</label>
+                        <input type="number" class="form-control" id="cantidad_producida" name="cantidad_producida" min="0" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="cantidad_rechazada" class="form-label">Cantidad Rechazada</label>
+                        <input type="number" class="form-control" id="cantidad_rechazada" name="cantidad_rechazada" min="0" value="0">
+                    </div>
+                    <div class="mb-3">
+                        <label for="lote" class="form-label">Lote</label>
+                        <input type="text" class="form-control" id="lote" name="lote" placeholder="Ej: LOTE-2025-001">
+                    </div>
+                    <div class="mb-3">
+                        <label for="observaciones" class="form-label">Observaciones</label>
+                        <textarea class="form-control" id="observaciones" name="observaciones" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Establecer fecha actual por defecto cuando se abre el modal
+    document.getElementById('modalProduccion').addEventListener('show.bs.modal', function() {
+        document.getElementById('fecha').valueAsDate = new Date();
+    });
+</script>
+{% endblock %}
+

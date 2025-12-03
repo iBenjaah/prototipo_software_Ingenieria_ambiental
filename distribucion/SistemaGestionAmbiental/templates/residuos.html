@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block title %}Residuos - Sistema de Gestión Ambiental{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-trash"></i> Gestión de Residuos</h1>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalResiduo">
+        <i class="bi bi-plus-circle"></i> Nuevo Registro
+    </button>
+</div>
+
+<!-- Leyenda de Colores -->
+<div class="card mb-3">
+    <div class="card-body">
+        <h6 class="mb-2"><i class="bi bi-palette"></i> Leyenda de Colores - Tipo de Residuo:</h6>
+        <div class="d-flex flex-wrap gap-2">
+            <span class="badge bg-danger">Pilas Rechazadas</span>
+            <span class="badge" style="background-color: #fd7e14; color: white;">Pilas Usadas</span>
+            <span class="badge" style="background-color: #0dcaf0; color: white;">Efluentes Alcalinos</span>
+            <span class="badge bg-secondary">Residuos Sólidos</span>
+            <span class="badge bg-dark">Otros</span>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <i class="bi bi-list-ul"></i> Registros de Residuos
+    </div>
+    <div class="card-body">
+        {% if registros %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Tipo de Residuo</th>
+                        <th>Cantidad</th>
+                        <th>Unidad</th>
+                        <th>Destino</th>
+                        <th>Gestor</th>
+                        <th>Observaciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reg in registros %}
+                    <tr>
+                        <td>{{ reg.fecha.strftime('%d/%m/%Y') }}</td>
+                        <td>
+                            {% if reg.tipo_residuo == 'pilas_rechazadas' %}
+                            <span class="badge bg-danger">{{ reg.tipo_residuo }}</span>
+                            {% elif reg.tipo_residuo == 'pilas_usadas' %}
+                            <span class="badge" style="background-color: #fd7e14; color: white;">{{ reg.tipo_residuo }}</span>
+                            {% elif reg.tipo_residuo == 'efluentes_alcalinos' %}
+                            <span class="badge" style="background-color: #0dcaf0; color: white;">{{ reg.tipo_residuo }}</span>
+                            {% elif reg.tipo_residuo == 'residuos_solidos' %}
+                            <span class="badge bg-secondary">{{ reg.tipo_residuo }}</span>
+                            {% else %}
+                            <span class="badge bg-dark">{{ reg.tipo_residuo }}</span>
+                            {% endif %}
+                        </td>
+                        <td><strong>{{ "%.2f"|format(reg.cantidad) }}</strong></td>
+                        <td>{{ reg.unidad }}</td>
+                        <td>
+                            {% if reg.destino == 'reciclaje' %}
+                            <span class="badge bg-success">Reciclaje</span>
+                            {% elif reg.destino == 'reproceso' %}
+                            <span class="badge bg-info">Reproceso</span>
+                            {% elif reg.destino == 'disposicion_final' %}
+                            <span class="badge bg-danger">Disposición Final</span>
+                            {% else %}
+                            {{ reg.destino or '-' }}
+                            {% endif %}
+                        </td>
+                        <td>{{ reg.gestor or '-' }}</td>
+                        <td>{{ reg.observaciones or '-' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted text-center py-4">No hay registros de residuos. Agregue el primer registro.</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal para nuevo registro -->
+<div class="modal fade" id="modalResiduo" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Nuevo Registro de Residuo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('residuos') }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="fecha" class="form-label">Fecha *</label>
+                        <input type="date" class="form-control" id="fecha" name="fecha" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="tipo_residuo" class="form-label">Tipo de Residuo *</label>
+                        <select class="form-select" id="tipo_residuo" name="tipo_residuo" required>
+                            <option value="">Seleccione...</option>
+                            <option value="pilas_usadas">Pilas Usadas</option>
+                            <option value="pilas_rechazadas">Pilas Rechazadas</option>
+                            <option value="efluentes_alcalinos">Efluentes Alcalinos</option>
+                            <option value="residuos_solidos">Residuos Sólidos</option>
+                            <option value="otros">Otros</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="cantidad" class="form-label">Cantidad *</label>
+                        <input type="number" class="form-control" id="cantidad" name="cantidad" step="0.01" min="0" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="unidad" class="form-label">Unidad *</label>
+                        <select class="form-select" id="unidad" name="unidad" required>
+                            <option value="">Seleccione...</option>
+                            <option value="unidades">Unidades</option>
+                            <option value="kg">Kilogramos (kg)</option>
+                            <option value="L">Litros (L)</option>
+                            <option value="m³">Metros cúbicos (m³)</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="destino" class="form-label">Destino</label>
+                        <select class="form-select" id="destino" name="destino">
+                            <option value="">Seleccione...</option>
+                            <option value="reciclaje">Reciclaje</option>
+                            <option value="reproceso">Reproceso</option>
+                            <option value="disposicion_final">Disposición Final</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="gestor" class="form-label">Gestor (Empresa)</label>
+                        <input type="text" class="form-control" id="gestor" name="gestor" placeholder="Nombre de la empresa gestora">
+                    </div>
+                    <div class="mb-3">
+                        <label for="observaciones" class="form-label">Observaciones</label>
+                        <textarea class="form-control" id="observaciones" name="observaciones" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Establecer fecha actual por defecto cuando se abre el modal
+    document.getElementById('modalResiduo').addEventListener('show.bs.modal', function() {
+        document.getElementById('fecha').valueAsDate = new Date();
+    });
+</script>
+{% endblock %}
+

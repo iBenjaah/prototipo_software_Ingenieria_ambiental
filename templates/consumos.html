@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block title %}Consumos - Sistema de Gestión Ambiental{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-droplet"></i> Gestión de Consumos</h1>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalConsumo">
+        <i class="bi bi-plus-circle"></i> Nuevo Registro
+    </button>
+</div>
+
+<!-- Leyenda de Colores -->
+<div class="card mb-3">
+    <div class="card-body">
+        <h6 class="mb-2"><i class="bi bi-palette"></i> Leyenda de Colores - Tipo de Recurso:</h6>
+        <div class="d-flex flex-wrap gap-2">
+            <span class="badge bg-primary">Agua</span>
+            <span class="badge bg-warning text-dark">Energía</span>
+            <span class="badge" style="background-color: #ff6b35; color: white;">Zinc</span>
+            <span class="badge" style="background-color: #6f42c1; color: white;">KOH</span>
+            <span class="badge bg-secondary">Acero</span>
+            <span class="badge bg-dark">Otros</span>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <i class="bi bi-list-ul"></i> Registros de Consumos
+    </div>
+    <div class="card-body">
+        {% if registros %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Tipo de Recurso</th>
+                        <th>Cantidad</th>
+                        <th>Unidad</th>
+                        <th>Costo</th>
+                        <th>Observaciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reg in registros %}
+                    <tr>
+                        <td>{{ reg.fecha.strftime('%d/%m/%Y') }}</td>
+                        <td>
+                            {% if reg.tipo_recurso == 'agua' %}
+                            <span class="badge bg-primary">{{ reg.tipo_recurso }}</span>
+                            {% elif reg.tipo_recurso == 'energia' %}
+                            <span class="badge bg-warning text-dark">{{ reg.tipo_recurso }}</span>
+                            {% elif reg.tipo_recurso == 'zinc' %}
+                            <span class="badge" style="background-color: #ff6b35; color: white;">{{ reg.tipo_recurso }}</span>
+                            {% elif reg.tipo_recurso == 'KOH' %}
+                            <span class="badge" style="background-color: #6f42c1; color: white;">{{ reg.tipo_recurso }}</span>
+                            {% elif reg.tipo_recurso == 'acero' %}
+                            <span class="badge bg-secondary">{{ reg.tipo_recurso }}</span>
+                            {% else %}
+                            <span class="badge bg-dark">{{ reg.tipo_recurso }}</span>
+                            {% endif %}
+                        </td>
+                        <td><strong>{{ "%.2f"|format(reg.cantidad) }}</strong></td>
+                        <td>{{ reg.unidad }}</td>
+                        <td>
+                            {% if reg.costo %}
+                            ${{ "%.2f"|format(reg.costo) }}
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                        <td>{{ reg.observaciones or '-' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted text-center py-4">No hay registros de consumos. Agregue el primer registro.</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal para nuevo registro -->
+<div class="modal fade" id="modalConsumo" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Nuevo Registro de Consumo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('consumos') }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="fecha" class="form-label">Fecha *</label>
+                        <input type="date" class="form-control" id="fecha" name="fecha" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="tipo_recurso" class="form-label">Tipo de Recurso *</label>
+                        <select class="form-select" id="tipo_recurso" name="tipo_recurso" required>
+                            <option value="">Seleccione...</option>
+                            <option value="agua">Agua</option>
+                            <option value="energia">Energía</option>
+                            <option value="zinc">Zinc</option>
+                            <option value="KOH">Hidróxido de Potasio (KOH)</option>
+                            <option value="acero">Acero</option>
+                            <option value="otros">Otros</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="cantidad" class="form-label">Cantidad *</label>
+                        <input type="number" class="form-control" id="cantidad" name="cantidad" step="0.01" min="0" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="unidad" class="form-label">Unidad *</label>
+                        <select class="form-select" id="unidad" name="unidad" required>
+                            <option value="">Seleccione...</option>
+                            <option value="L">Litros (L)</option>
+                            <option value="kWh">Kilovatios-hora (kWh)</option>
+                            <option value="kg">Kilogramos (kg)</option>
+                            <option value="g">Gramos (g)</option>
+                            <option value="m³">Metros cúbicos (m³)</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="costo" class="form-label">Costo (opcional)</label>
+                        <input type="number" class="form-control" id="costo" name="costo" step="0.01" min="0">
+                    </div>
+                    <div class="mb-3">
+                        <label for="observaciones" class="form-label">Observaciones</label>
+                        <textarea class="form-control" id="observaciones" name="observaciones" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Establecer fecha actual por defecto cuando se abre el modal
+    document.getElementById('modalConsumo').addEventListener('show.bs.modal', function() {
+        document.getElementById('fecha').valueAsDate = new Date();
+    });
+</script>
+{% endblock %}
+

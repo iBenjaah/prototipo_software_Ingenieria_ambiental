@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+
+{% block title %}Reciclaje - Sistema de Gestión Ambiental{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-arrow-repeat"></i> Gestión de Reciclaje</h1>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalReciclaje">
+        <i class="bi bi-plus-circle"></i> Nuevo Registro
+    </button>
+</div>
+
+<!-- Leyenda de Colores -->
+<div class="card mb-3">
+    <div class="card-body">
+        <h6 class="mb-2"><i class="bi bi-palette"></i> Leyenda de Colores - Material Recuperado:</h6>
+        <div class="d-flex flex-wrap gap-2">
+            <span class="badge" style="background-color: #ffa500; color: white;">Zinc</span>
+            <span class="badge bg-secondary">Acero</span>
+            <span class="badge" style="background-color: #6f42c1; color: white;">KOH</span>
+            <span class="badge bg-dark">Otros</span>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <i class="bi bi-list-ul"></i> Registros de Reciclaje y Recuperación
+    </div>
+    <div class="card-body">
+        {% if registros %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Material Recuperado</th>
+                        <th>Cantidad</th>
+                        <th>Unidad</th>
+                        <th>Origen</th>
+                        <th>Valor Estimado</th>
+                        <th>Observaciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reg in registros %}
+                    <tr>
+                        <td>{{ reg.fecha.strftime('%d/%m/%Y') }}</td>
+                        <td>
+                            {% if reg.material_recuperado == 'zinc' %}
+                            <span class="badge" style="background-color: #ffa500; color: white;">{{ reg.material_recuperado }}</span>
+                            {% elif reg.material_recuperado == 'acero' %}
+                            <span class="badge bg-secondary">{{ reg.material_recuperado }}</span>
+                            {% elif reg.material_recuperado == 'KOH' %}
+                            <span class="badge" style="background-color: #6f42c1; color: white;">{{ reg.material_recuperado }}</span>
+                            {% else %}
+                            <span class="badge bg-dark">{{ reg.material_recuperado }}</span>
+                            {% endif %}
+                        </td>
+                        <td><strong>{{ "%.2f"|format(reg.cantidad) }}</strong></td>
+                        <td>{{ reg.unidad }}</td>
+                        <td>{{ reg.origen or '-' }}</td>
+                        <td>
+                            {% if reg.valor_estimado %}
+                            ${{ "%.2f"|format(reg.valor_estimado) }}
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                        <td>{{ reg.observaciones or '-' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted text-center py-4">No hay registros de reciclaje. Agregue el primer registro.</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal para nuevo registro -->
+<div class="modal fade" id="modalReciclaje" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Nuevo Registro de Reciclaje</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('reciclaje') }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="fecha" class="form-label">Fecha *</label>
+                        <input type="date" class="form-control" id="fecha" name="fecha" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="material_recuperado" class="form-label">Material Recuperado *</label>
+                        <select class="form-select" id="material_recuperado" name="material_recuperado" required>
+                            <option value="">Seleccione...</option>
+                            <option value="zinc">Zinc</option>
+                            <option value="acero">Acero</option>
+                            <option value="KOH">Hidróxido de Potasio (KOH)</option>
+                            <option value="otros">Otros</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="cantidad" class="form-label">Cantidad *</label>
+                        <input type="number" class="form-control" id="cantidad" name="cantidad" step="0.01" min="0" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="unidad" class="form-label">Unidad *</label>
+                        <select class="form-select" id="unidad" name="unidad" required>
+                            <option value="">Seleccione...</option>
+                            <option value="kg">Kilogramos (kg)</option>
+                            <option value="g">Gramos (g)</option>
+                            <option value="L">Litros (L)</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="origen" class="form-label">Origen</label>
+                        <select class="form-select" id="origen" name="origen">
+                            <option value="">Seleccione...</option>
+                            <option value="pilas_usadas">Pilas Usadas</option>
+                            <option value="pilas_rechazadas">Pilas Rechazadas</option>
+                            <option value="reproceso_interno">Reproceso Interno</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="valor_estimado" class="form-label">Valor Estimado (opcional)</label>
+                        <input type="number" class="form-control" id="valor_estimado" name="valor_estimado" step="0.01" min="0">
+                    </div>
+                    <div class="mb-3">
+                        <label for="observaciones" class="form-label">Observaciones</label>
+                        <textarea class="form-control" id="observaciones" name="observaciones" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Establecer fecha actual por defecto cuando se abre el modal
+    document.getElementById('modalReciclaje').addEventListener('show.bs.modal', function() {
+        document.getElementById('fecha').valueAsDate = new Date();
+    });
+</script>
+{% endblock %}
+

@@ -1,0 +1,66 @@
+========================================
+SISTEMA DE GESTIÓN AMBIENTAL
+Baterías Zinc-Aire
+========================================
+
+BIENVENIDO
+
+Este paquete contiene el Sistema Informático de Gestión Ambiental
+para el seguimiento de variables críticas en la producción y ciclo
+de vida de baterías zinc-aire tipo botón.
+
+========================================
+OPCIONES DE INSTALACIÓN
+========================================
+
+OPCIÓN 1: USAR EJECUTABLE (MÁS FÁCIL)
+--------------------------------------
+1. Doble clic en: SistemaGestionAmbiental.exe
+2. Abrir navegador en: http://127.0.0.1:5000
+3. ¡Listo! No requiere instalación adicional.
+
+OPCIÓN 2: INSTALACIÓN MANUAL
+-----------------------------
+1. Ejecutar: instalar.bat
+2. Ejecutar: iniciar.bat
+3. Abrir navegador en: http://127.0.0.1:5000
+
+OPCIÓN 3: GENERAR DATOS DE EJEMPLO
+-----------------------------------
+Para ver el sistema con datos ficticios:
+- Ejecutar: generar_datos.bat
+
+========================================
+REQUISITOS
+========================================
+
+- Windows 10 o superior
+- Python 3.8+ (solo si usa instalación manual)
+- Navegador web moderno
+
+========================================
+ARCHIVOS INCLUIDOS
+========================================
+
+- SistemaGestionAmbiental.exe  (Ejecutable - usar este)
+- app.py                       (Código fuente)
+- instalar.bat                 (Instalación manual)
+- iniciar.bat                  (Iniciar sistema)
+- generar_datos.bat            (Datos de ejemplo)
+- requirements.txt             (Dependencias)
+- README.md                    (Documentación completa)
+- INSTALACION.md               (Guía de instalación)
+
+========================================
+AYUDA
+========================================
+
+Para más información, consultar:
+- README.md
+- INSTALACION.md
+
+========================================
+Versión: 1.0.0
+Fecha: Diciembre 2025
+========================================
+
