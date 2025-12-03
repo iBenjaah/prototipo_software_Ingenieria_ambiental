@@ -472,5 +472,22 @@ def init_db():
 
 if __name__ == '__main__':
     init_db()
-    app.run(debug=True, host='127.0.0.1', port=5000)
+    
+    # Abrir navegador automáticamente
+    import webbrowser
+    import threading
+    import time
+    
+    def open_browser():
+        """Abre el navegador después de un breve delay"""
+        time.sleep(1.5)  # Esperar a que el servidor inicie
+        webbrowser.open('http://127.0.0.1:5000')
+    
+    # Iniciar el navegador en un thread separado
+    browser_thread = threading.Thread(target=open_browser)
+    browser_thread.daemon = True
+    browser_thread.start()
+    
+    # Ejecutar servidor (sin debug en producción)
+    app.run(debug=False, host='127.0.0.1', port=5000, use_reloader=False)
 

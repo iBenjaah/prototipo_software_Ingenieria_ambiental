@@ -23,12 +23,18 @@ Sistema informático desarrollado para el seguimiento y gestión de variables am
 
 ### Instalación
 
-#### Opción 1: Instalación Rápida (Recomendada)
+#### Opción 1: Usar Ejecutable (Recomendado - Más Fácil)
 
-1. **Extraer el archivo ZIP** del sistema en una carpeta
-2. **Ejecutar `instalar.bat`** para instalar dependencias
-3. **Ejecutar `iniciar.bat`** para iniciar el sistema
-4. **Abrir en el navegador**: `http://127.0.0.1:5000`
+Si se incluye el ejecutable `SistemaGestionAmbiental.exe`:
+1. **Doble clic** en `SistemaGestionAmbiental.exe`
+2. **El navegador se abrirá automáticamente** en `http://127.0.0.1:5000`
+3. **¡Listo!** No requiere instalación adicional
+
+**Características del ejecutable:**
+- ✅ Sin ventana de consola visible
+- ✅ Abre el navegador automáticamente
+- ✅ Incluye todas las dependencias
+- ✅ No requiere Python instalado
 
 #### Opción 2: Instalación Manual
 
@@ -46,11 +52,12 @@ python app.py
 4. **Abrir en el navegador**:
    - Navegar a: `http://127.0.0.1:5000`
 
-#### Opción 3: Usar Ejecutable
+#### Opción 3: Instalación con Scripts
 
-Si se incluye el ejecutable `SistemaGestionAmbiental.exe`:
-1. **Doble clic** en `SistemaGestionAmbiental.exe`
-2. **Abrir en el navegador**: `http://127.0.0.1:5000`
+1. **Extraer el archivo ZIP** del sistema en una carpeta
+2. **Ejecutar `instalar.bat`** para instalar dependencias
+3. **Ejecutar `iniciar.bat`** para iniciar el sistema
+4. **Abrir en el navegador**: `http://127.0.0.1:5000`
 
 #### Generar Datos de Ejemplo
 
@@ -59,6 +66,8 @@ Para ver el sistema con datos de ejemplo:
 python datos_ejemplo.py
 ```
 O ejecutar: `generar_datos.bat`
+
+**Nota:** Existe una versión especial `SistemaGestionAmbiental_Presentacion.exe` que incluye datos de ejemplo pre-cargados, ideal para demostraciones y presentaciones.
 
 ### Estructura del Proyecto
 
@@ -151,6 +160,16 @@ El sistema utiliza SQLite como base de datos local. La base de datos se crea aut
 - La aplicación se ejecuta en `http://127.0.0.1:5000` por defecto
 - Para producción, se recomienda usar un servidor WSGI como Gunicorn
 
+### Versiones Disponibles
+
+- **SistemaGestionAmbiental.exe**: Versión estándar sin datos
+- **SistemaGestionAmbiental_Presentacion.exe**: Versión con datos de ejemplo pre-cargados (ideal para demostraciones)
+
+### Repositorio
+
+El código fuente está disponible en GitHub:
+**https://github.com/iBenjaah/prototipo_software_Ingenieria_ambiental**
+
 ### Soporte
 
 Para consultas o problemas, revisar la documentación del proyecto o contactar al equipo de desarrollo.
@@ -162,5 +181,6 @@ Este software fue desarrollado como parte de un proyecto académico de Ingenier�
 ---
 
 **Versión**: 1.0.0  
-**Fecha**: Diciembre 2025
+**Fecha**: Diciembre 2025  
+**Equipo**: Equipo 2 - Ingeniería Ambiental
 

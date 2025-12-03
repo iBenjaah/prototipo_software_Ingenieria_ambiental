@@ -14,7 +14,7 @@ echo.
 echo [2/4] ¿Desea crear el ejecutable? (S/N)
 set /p crear_exe=
 if /i "%crear_exe%"=="S" (
-    call crear_ejecutable.bat
+    call crear_ejecutable_amigable.bat
     if exist "dist\SistemaGestionAmbiental.exe" (
         copy "dist\SistemaGestionAmbiental.exe" "distribucion\SistemaGestionAmbiental\"
         echo Ejecutable copiado al paquete.

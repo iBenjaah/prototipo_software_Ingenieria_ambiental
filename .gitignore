@@ -46,3 +46,10 @@ Thumbs.db
 # Logs
 *.log
 
+# Archivos de build y distribución (excepto el ejecutable final)
+build/
+dist/
+*.spec
+!dist/SistemaGestionAmbiental.exe
+!dist/SistemaGestionAmbiental_Presentacion.exe
+

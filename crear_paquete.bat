@@ -15,6 +15,8 @@ copy "app.py" "distribucion\SistemaGestionAmbiental\"
 copy "requirements.txt" "distribucion\SistemaGestionAmbiental\"
 copy "datos_ejemplo.py" "distribucion\SistemaGestionAmbiental\"
 copy "README.md" "distribucion\SistemaGestionAmbiental\"
+copy "INSTALACION.md" "distribucion\SistemaGestionAmbiental\" 2>nul
+copy "DISTRIBUCION.md" "distribucion\SistemaGestionAmbiental\" 2>nul
 xcopy /E /I "templates" "distribucion\SistemaGestionAmbiental\templates"
 if exist "static" xcopy /E /I "static" "distribucion\SistemaGestionAmbiental\static"
 
